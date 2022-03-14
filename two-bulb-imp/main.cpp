@@ -123,8 +123,8 @@ int main(int argc, const char * argv[]) {
     
     // Time parameters
     double to = 0.0;
-    double tf = 5.0;
-    int nt = 20;
+    double tf = 20.0;
+    int nt = 40;
     double dt = (double) (tf - to) / nt;
     
     // Diffusivities
@@ -155,7 +155,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // Perform iterations
-    int max_out_it = 300;
+    int max_out_it = 500;
     int max_in_it = 300;
     
     double t = to;
@@ -213,9 +213,9 @@ int main(int argc, const char * argv[]) {
                 double x1e = 0.5 * (tube_fracs_inter[0].x1 + tube_fracs_inter[1].x1);
                 double x2e = 0.5 * (tube_fracs_inter[0].x2 + tube_fracs_inter[1].x2);
                 
-                double x2P = tube_fracs_inter[0].x2;
+                double x2P = tube_fracs[0].x2;
                 double x1E = tube_fracs[1].x1;
-                double x2E = tube_fracs_inter[1].x2;
+                double x2E = tube_fracs[1].x2;
                 
                 double beta1w = beta1(p_params, x1w, x2w);
                 double beta2w = beta2(p_params, x1w, x2w);
@@ -261,10 +261,10 @@ int main(int argc, const char * argv[]) {
                     double x2e = 0.5 * (tube_fracs_inter[node].x2 + tube_fracs_inter[node + 1].x2);
 
                     double x1W = tube_fracs[node - 1].x1;
-                    double x2W = tube_fracs_inter[node - 1].x2;
+                    double x2W = tube_fracs[node - 1].x2;
                     double x1E = tube_fracs[node + 1].x1;
-                    double x2E = tube_fracs_inter[node + 1].x2;
-                    double x2P = tube_fracs_inter[node].x2;
+                    double x2E = tube_fracs[node + 1].x2;
+                    double x2P = tube_fracs[node].x2;
 
                     double beta1w = beta1(p_params, x1w, x2w);
                     double beta2w = beta2(p_params, x1w, x2w);
@@ -289,11 +289,11 @@ int main(int argc, const char * argv[]) {
                     double x1e = 0.5 * (tube_fracs_inter[node].x1 + tube_fracs_inter[node + 1].x1);
                     double x2e = 0.5 * (tube_fracs_inter[node].x2 + tube_fracs_inter[node + 1].x2);
 
-                    double x1W = tube_fracs_inter[node - 1].x1;
+                    double x1W = tube_fracs[node - 1].x1;
                     double x2W = tube_fracs[node - 1].x2;
-                    double x1E = tube_fracs_inter[node + 1].x1;
+                    double x1E = tube_fracs[node + 1].x1;
                     double x2E = tube_fracs[node + 1].x2;
-                    double x1P = tube_fracs_inter[node].x1;
+                    double x1P = tube_fracs[node].x1;
 
                     double alpha1w = alpha1(p_params, x1w, x2w);
                     double alpha2w = alpha2(p_params, x1w, x2w);
@@ -318,10 +318,10 @@ int main(int argc, const char * argv[]) {
                 x2e = bulb_data_inter.mol_fracs_bulb2.x2;
                 
                 double x1W = tube_fracs[ng - 2].x1;
-                double x2W = tube_fracs_inter[ng - 2].x2;
+                double x2W = tube_fracs[ng - 2].x2;
                 x1E = x1e;
                 x2E = x2e;
-                x2P = tube_fracs_inter[ng - 1].x2;
+                x2P = tube_fracs[ng - 1].x2;
                 
                 beta1w = beta1(p_params, x1w, x2w);
                 beta2w = beta2(p_params, x1w, x2w);
@@ -344,11 +344,11 @@ int main(int argc, const char * argv[]) {
                 x1e = bulb_data_inter.mol_fracs_bulb2.x1;
                 x2e = bulb_data_inter.mol_fracs_bulb2.x2;
                 
-                x1W = tube_fracs_inter[ng - 2].x1;
+                x1W = tube_fracs[ng - 2].x1;
                 x2W = tube_fracs[ng - 2].x2;
                 x1E = x1e;
                 x2E = x2e;
-                x1P = tube_fracs_inter[ng - 1].x1;
+                x1P = tube_fracs[ng - 1].x1;
                 x2P = tube_fracs[ng - 1].x2;
                 
                 alpha1w = alpha1(p_params, x1w, x2w);
@@ -442,11 +442,15 @@ int main(int argc, const char * argv[]) {
     for(int node = 1; node < ng - 1; ++node) {
         double x1_loc_z = 0.5 * (tube_fracs[node - 1].x1 + tube_fracs[node].x1);
         double x2_loc_z = 0.5 * (tube_fracs[node - 1].x2 + tube_fracs[node].x2);
+        double a1_loc_z = alpha1(p_params, x1_loc_z, x2_loc_z);
+        double a2_loc_z = alpha2(p_params, x1_loc_z, x2_loc_z);
         double b1_loc_z = beta1(p_params, x1_loc_z, x2_loc_z);
         double b2_loc_z = beta2(p_params, x1_loc_z, x2_loc_z);
      
         double x1_loc_z_dz = 0.5 * (tube_fracs[node + 1].x1 + tube_fracs[node].x1);
         double x2_loc_z_dz = 0.5 * (tube_fracs[node + 1].x2 + tube_fracs[node].x2);
+        double a1_loc_z_dz = alpha1(p_params, x1_loc_z_dz, x2_loc_z_dz);
+        double a2_loc_z_dz = alpha2(p_params, x1_loc_z_dz, x2_loc_z_dz);
         double b1_loc_z_dz = beta1(p_params, x1_loc_z_dz, x2_loc_z_dz);
         double b2_loc_z_dz = beta2(p_params, x1_loc_z_dz, x2_loc_z_dz);
         
@@ -460,13 +464,20 @@ int main(int argc, const char * argv[]) {
         
         double J1_z = b1_loc_z * (x1P - x1W) / dz + b2_loc_z * (x2P - x2W) / dz;
         double J1_z_dz = b1_loc_z_dz * (x1E - x1P) / dz + b2_loc_z_dz * (x2E - x2P) / dz;
+        double J2_z = a1_loc_z * (x1P - x1W) / dz + a2_loc_z * (x2P - x2W) / dz;
+        double J2_z_dz = a1_loc_z_dz * (x1E - x1P) / dz + a2_loc_z_dz * (x2E - x2P) / dz;
         
-        double var1 = p_params.ct * (tube_fracs[node].x1 - tube_fracs_old[node].x1) / dt;
-        double var2 = (J1_z - J1_z_dz) / dz;
+        double var1c1 = p_params.ct * (tube_fracs[node].x1 - tube_fracs_old[node].x1) / dt;
+        double var2c1 = (J1_z - J1_z_dz) / dz;
         
-        double res = var1 / var2;
+        double var1c2 = p_params.ct * (tube_fracs[node].x2 - tube_fracs_old[node].x2) / dt;
+        double var2c2 = (J2_z - J2_z_dz) / dz;
         
-        std::cout << "ratio: " << res << std::endl;
+        double res1 = var1c1 / var2c1;
+        double res2 = var1c2 / var2c2;
+        
+        std::cout << "ratio mid component 1: " << res1 << std::endl;
+        std::cout << "ratio mid component 2: " << res2 << std::endl;
         
     }
     
