@@ -44,4 +44,17 @@ typedef struct experiment_params {
     double dz;
 } e_params_t;
 
+typedef struct computation_data {
+    int ng;
+    p_params_t p_params;
+    e_params_t e_params;
+    t_params_t t_params;
+    b_data_t bulb_data_inter;
+    b_data_t bulb_data_old;
+    b_data_t bulb_data;
+    node_t * tube_fracs;
+    node_t * tube_fracs_old;
+    node_t * tube_fracs_inter;
+} c_data_t;
+
 #endif /* user_types_h */
