@@ -545,8 +545,10 @@ void compute_bulb_compositions(e_params_t e_params,
         int out_it = 0;
         while(out_it < max_out_it) {
             
+            // Update intermediate bulb composition
             comp_data.bulb_data_inter = comp_data.bulb_data;
             
+            // Update intermediate tube composition
             for(int node = 0; node < ng; ++node)
                 comp_data.tube_fracs_inter[node] = comp_data.tube_fracs[node];
             
@@ -554,6 +556,7 @@ void compute_bulb_compositions(e_params_t e_params,
             int in_it = 0;
             while(in_it < max_in_it) {
 
+                // Update estimate tube composition
                 update_tube_fracs(comp_data);
                 
                 in_it++;
