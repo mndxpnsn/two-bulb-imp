@@ -44,7 +44,7 @@ int main(int argc, const char * argv[]) {
     t_params_t t_params;
     t_params.to = 0.0;
     t_params.tf = 5.0;
-    t_params.nt = 10;
+    t_params.nt = 40;
     t_params.dt = (double) (t_params.tf - t_params.to) / t_params.nt;
     
     // Diffusivities
