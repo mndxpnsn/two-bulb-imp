@@ -454,28 +454,67 @@ void set_frac_comp3(c_data_t & comp_data) {
     }
 }
 
+void update_tube_fracs(c_data_t & comp_data) {
+    
+    // Bulb 1, component 1
+    bulb1_c1(comp_data);
+    
+    // Bulb 1, component 2
+    bulb1_c2(comp_data);
+
+    // Tube node 0, component 1
+    tube0_c1(comp_data);
+    
+    // Tube node 0, component 2
+    tube0_c2(comp_data);
+    
+    // Tube mid nodes, component 1
+    mid_nodes1(comp_data);
+    
+    // Tube mid nodes, component 2
+    mid_nodes2(comp_data);
+    
+    // Tube node n, component 1
+    tube_n_c1(comp_data);
+    
+    // Tube node n, component 2
+    tube_n_c2(comp_data);
+    
+    // Set mole fraction component 3
+    set_frac_comp3(comp_data);
+    
+    // Bulb 2, component 1
+    bulb2_c1(comp_data);
+    
+    // Bulb 2, component 2
+    bulb2_c2(comp_data);
+}
+
 void compute_bulb_compositions(e_params_t e_params,
                                p_params_t p_params,
                                t_params_t t_params,
                                int ng,
                                b_data_t & bulb_data) {
     
+    // Organize data
+    c_data_t comp_data;
+    
     // Mole fractions in tube
-    node_t * tube_fracs = new node_t[ng];
-    node_t * tube_fracs_inter = new node_t[ng];
-    node_t * tube_fracs_old = new node_t[ng];
+    comp_data.tube_fracs = new node_t[ng];
+    comp_data.tube_fracs_inter = new node_t[ng];
+    comp_data.tube_fracs_old = new node_t[ng];
     
     // Initialize tube composition
     for(int node = 0; node < ng; ++node) {
-        tube_fracs[node].x1 = 1.0 / 3;
-        tube_fracs[node].x2 = 1.0 / 3;
-        tube_fracs[node].x3 = 1.0 / 3;
-        tube_fracs_inter[node].x1 = 1.0 / 3;
-        tube_fracs_inter[node].x2 = 1.0 / 3;
-        tube_fracs_inter[node].x3 = 1.0 / 3;
-        tube_fracs_old[node].x1 = 1.0 / 3;
-        tube_fracs_old[node].x2 = 1.0 / 3;
-        tube_fracs_old[node].x3 = 1.0 / 3;
+        comp_data.tube_fracs[node].x1 = 1.0 / 3;
+        comp_data.tube_fracs[node].x2 = 1.0 / 3;
+        comp_data.tube_fracs[node].x3 = 1.0 / 3;
+        comp_data.tube_fracs_inter[node].x1 = 1.0 / 3;
+        comp_data.tube_fracs_inter[node].x2 = 1.0 / 3;
+        comp_data.tube_fracs_inter[node].x3 = 1.0 / 3;
+        comp_data.tube_fracs_old[node].x1 = 1.0 / 3;
+        comp_data.tube_fracs_old[node].x2 = 1.0 / 3;
+        comp_data.tube_fracs_old[node].x3 = 1.0 / 3;
     }
     
     // Perform iterations
@@ -485,11 +524,7 @@ void compute_bulb_compositions(e_params_t e_params,
     double t = t_params.to;
     double dt = (t_params.tf - t_params.to) / t_params.nt;
     
-    // Organize data
-    c_data_t comp_data;
-    comp_data.tube_fracs = tube_fracs;
-    comp_data.tube_fracs_inter = tube_fracs_inter;
-    comp_data.tube_fracs_old = tube_fracs_old;
+    // Organize data continued
     comp_data.ng = ng;
     comp_data.p_params = p_params;
     comp_data.e_params = e_params;
@@ -498,58 +533,28 @@ void compute_bulb_compositions(e_params_t e_params,
     comp_data.bulb_data_old = bulb_data;
     comp_data.bulb_data_inter = bulb_data;
     
+    // Compute composition
     while(t < t_params.tf) {
         
         comp_data.bulb_data_old = comp_data.bulb_data;
         
-        for(int node = 0; node < ng; ++node) {
+        for(int node = 0; node < ng; ++node)
             comp_data.tube_fracs_old[node] = comp_data.tube_fracs[node];
-        }
         
+        // Outer Gauss-Seidel iterations
         int out_it = 0;
         while(out_it < max_out_it) {
             
             comp_data.bulb_data_inter = comp_data.bulb_data;
             
-            for(int node = 0; node < ng; ++node) {
+            for(int node = 0; node < ng; ++node)
                 comp_data.tube_fracs_inter[node] = comp_data.tube_fracs[node];
-            }
             
+            // Inner Gauss-Seidel iterations
             int in_it = 0;
             while(in_it < max_in_it) {
-                
-                // Bulb 1, component 1
-                bulb1_c1(comp_data);
-                
-                // Bulb 1, component 2
-                bulb1_c2(comp_data);
 
-                // Tube node 0, component 1
-                tube0_c1(comp_data);
-                
-                // Tube node 0, component 2
-                tube0_c2(comp_data);
-                
-                // Tube mid nodes, component 1
-                mid_nodes1(comp_data);
-                
-                // Tube mid nodes, component 2
-                mid_nodes2(comp_data);
-                
-                // Tube node n, component 1
-                tube_n_c1(comp_data);
-                
-                // Tube node n, component 2
-                tube_n_c2(comp_data);
-                
-                // Set mole fraction component 3
-                set_frac_comp3(comp_data);
-                
-                // Bulb 2, component 1
-                bulb2_c1(comp_data);
-                
-                // Bulb 2, component 2
-                bulb2_c2(comp_data);
+                update_tube_fracs(comp_data);
                 
                 in_it++;
             }
@@ -563,7 +568,7 @@ void compute_bulb_compositions(e_params_t e_params,
     // Set bulb data
     bulb_data = comp_data.bulb_data;
     
-    delete [] tube_fracs;
-    delete [] tube_fracs_inter;
-    delete [] tube_fracs_old;
+    delete [] comp_data.tube_fracs;
+    delete [] comp_data.tube_fracs_inter;
+    delete [] comp_data.tube_fracs_old;
 }
