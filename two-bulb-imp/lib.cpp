@@ -499,7 +499,7 @@ void compute_bulb_compositions(e_params_t e_params,
     // Organize data
     c_data_t comp_data;
     
-    // Mole fractions in tube
+    // Allocate data for tube composition
     comp_data.tube_fracs = new node_t[ng];
     comp_data.tube_fracs_inter = new node_t[ng];
     comp_data.tube_fracs_old = new node_t[ng];
