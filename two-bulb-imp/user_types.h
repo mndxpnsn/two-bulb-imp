@@ -2,7 +2,7 @@
 //  user_types.h
 //  two-bulb-imp
 //
-//  Created by Derek Harrison on 14/03/2022.
+//  Created by dwh on 14/03/2022.
 //
 
 #ifndef user_types_h
@@ -10,6 +10,7 @@
 
 const int MAX_OUT = 300;
 const int MAX_IN = 300;
+const double SMALL_NUM = 1e-13;
 
 typedef struct node_data {
     double x1;
@@ -46,12 +47,15 @@ typedef struct experiment_params {
 
 typedef struct computation_data {
     int ng;
+
     p_params_t p_params;
     e_params_t e_params;
     t_params_t t_params;
+
     b_data_t bulb_data_inter;
     b_data_t bulb_data_old;
     b_data_t bulb_data;
+
     node_t * tube_fracs;
     node_t * tube_fracs_old;
     node_t * tube_fracs_inter;

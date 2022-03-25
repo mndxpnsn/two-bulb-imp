@@ -2,11 +2,12 @@
 //  main.cpp
 //  two-bulb-imp
 //
-//  Created by mndx on 12/03/2022.
+//  Created by dwh on 12/03/2022.
 //  Three-component two-bulb diffusion
 //  using implicit time discretization
 //
 
+#include <chrono>
 #include <iostream>
 
 #include "lib.hpp"
@@ -48,12 +49,21 @@ int main(int argc, const char * argv[]) {
     t_params.dt = (double) (t_params.tf - t_params.to) / t_params.nt; // Time sampling
     
     // Diffusivities
-    p_params.D12 = 8.33e-5 * 3600;
-    p_params.D13 = 6.8e-5 * 3600;
-    p_params.D23 = 1.68e-5 * 3600;
+    p_params.D12 = 8.33e-5 * 3600; // units (m2 / h)
+    p_params.D13 = 6.8e-5 * 3600; // units (m2 / h)
+    p_params.D23 = 1.68e-5 * 3600; // units (m2 / h)
+
+    // Start timing experiment
+    auto start = std::chrono::steady_clock::now();
 
     // Perform two-bulb diffusion experiment
     compute_bulb_compositions(e_params, p_params, t_params, ng, bulb_data);
+
+    // End timing experiment
+    auto end = std::chrono::steady_clock::now();
+
+    // Get experiment runtime
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     // Print results
     std::cout << "bulb 1 frac 1: " << bulb_data.mol_fracs_bulb1.x1 << std::endl;
@@ -63,6 +73,9 @@ int main(int argc, const char * argv[]) {
     std::cout << "bulb 2 frac 1: " << bulb_data.mol_fracs_bulb2.x1 << std::endl;
     std::cout << "bulb 2 frac 2: " << bulb_data.mol_fracs_bulb2.x2 << std::endl;
     std::cout << "bulb 2 frac 3: " << bulb_data.mol_fracs_bulb2.x3 << std::endl;
-    
+    std::cout << "run time: " << time.count() << " (ms)" << std::endl;
+
+    print_stability();
+
     return 0;
 }
