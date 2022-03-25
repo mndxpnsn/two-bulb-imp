@@ -2,11 +2,12 @@
 //  lib.cpp
 //  two-bulb-imp
 //
-//  Created by Derek Harrison on 14/03/2022.
+//  Created by mndx on 14/03/2022.
 //
 
-#include <stdio.h>
 #include <iostream>
+#include <stdio.h>
+#include <vector>
 
 #include "lib.hpp"
 #include "user_types.h"
@@ -79,157 +80,121 @@ double beta2(p_params_t & p_params, double x1, double x2) {
 }
 
 void bulb1_c1(c_data_t & comp_data) {
-    
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_old = comp_data.bulb_data_old;
-    b_data_t bulb_data = comp_data.bulb_data;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    
-    double V = e_params.V;
-    double A = e_params.A;
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+
+    double V = comp_data.e_params.V;
+    double A = comp_data.e_params.A;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
     // Bulb 1, component 1
-    double x1 = bulb_data.mol_fracs_bulb1.x1;
-    double x2 = bulb_data.mol_fracs_bulb1.x2;
-    double beta1_loc = beta1(p_params, x1, x2);
-    double beta2_loc = beta2(p_params, x1, x2);
-    double ap1 = V * p_params.ct / dt - 2 * beta1_loc * A / dz;
-    double x11 = tube_fracs[0].x1;
-    double x21 = tube_fracs[0].x2;
-    double old_term1 = V * p_params.ct * bulb_data_old.mol_fracs_bulb1.x1 / dt;
+    double x1 = comp_data.bulb_data.mol_fracs_bulb1.x1;
+    double x2 = comp_data.bulb_data.mol_fracs_bulb1.x2;
+    double beta1_loc = beta1(comp_data.p_params, x1, x2);
+    double beta2_loc = beta2(comp_data.p_params, x1, x2);
+    double ap1 = V * comp_data.p_params.ct / dt - 2 * beta1_loc * A / dz;
+    double x11 = comp_data.tube_fracs[0].x1;
+    double x21 = comp_data.tube_fracs[0].x2;
+    double old_term1 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb1.x1 / dt;
     
     double x1_b1 = -2 * beta1_loc * x11 * A / dz - 2 * beta2_loc * (x21 - x2) * A / dz + old_term1;
     x1_b1 = x1_b1 / ap1;
-    
+
     comp_data.bulb_data.mol_fracs_bulb1.x1 = x1_b1;
 }
 
 void bulb1_c2(c_data_t & comp_data) {
-    
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_old = comp_data.bulb_data_old;
-    b_data_t bulb_data = comp_data.bulb_data;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    
-    double V = e_params.V;
-    double A = e_params.A;
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+
+    double V = comp_data.e_params.V;
+    double A = comp_data.e_params.A;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
     // Bulb 1, component 2
-    double x1 = bulb_data.mol_fracs_bulb1.x1;
-    double x2 = bulb_data.mol_fracs_bulb1.x2;
-    double alpha1_loc = alpha1(p_params, x1, x2);
-    double alpha2_loc = alpha2(p_params, x1, x2);
-    double ap2 = V * p_params.ct / dt - 2 * alpha2_loc * A / dz;
-    double x11 = tube_fracs[0].x1;
-    double x21 = tube_fracs[0].x2;
-    double old_term2 = V * p_params.ct * bulb_data_old.mol_fracs_bulb1.x2 / dt;
+    double x1 = comp_data.bulb_data.mol_fracs_bulb1.x1;
+    double x2 = comp_data.bulb_data.mol_fracs_bulb1.x2;
+    double alpha1_loc = alpha1(comp_data.p_params, x1, x2);
+    double alpha2_loc = alpha2(comp_data.p_params, x1, x2);
+    double ap2 = V * comp_data.p_params.ct / dt - 2 * alpha2_loc * A / dz;
+    double x11 = comp_data.tube_fracs[0].x1;
+    double x21 = comp_data.tube_fracs[0].x2;
+    double old_term2 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb1.x2 / dt;
 
     double x2_b1 = -2 * alpha1_loc / dz * (x11 - x1) * A  - 2 * alpha2_loc * x21 * A / dz + old_term2;
     x2_b1 = x2_b1 / ap2;
-    
+
     comp_data.bulb_data.mol_fracs_bulb1.x2 = x2_b1;
-    comp_data.bulb_data.mol_fracs_bulb1.x3 = 1.0 - bulb_data.mol_fracs_bulb1.x1 - x2_b1;
+    comp_data.bulb_data.mol_fracs_bulb1.x3 = 1.0 - comp_data.bulb_data.mol_fracs_bulb1.x1 - x2_b1;
 }
 
 void bulb2_c1(c_data_t & comp_data) {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_old = comp_data.bulb_data_old;
-    b_data_t bulb_data = comp_data.bulb_data;
-    node_t * tube_fracs = comp_data.tube_fracs;
+    double V = comp_data.e_params.V;
+    double A = comp_data.e_params.A;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    double V = e_params.V;
-    double A = e_params.A;
-    double dz = e_params.dz;
-    double dt = t_params.dt;
-    
-    double x1 = bulb_data.mol_fracs_bulb2.x1;
-    double x2 = bulb_data.mol_fracs_bulb2.x2;
-    double beta1_loc = beta1(p_params, x1, x2);
-    double beta2_loc = beta2(p_params, x1, x2);
-    double ap1 = V * p_params.ct / dt - 2 * beta1_loc * A / dz;
-    double x1n = tube_fracs[ng - 1].x1;
-    double x2n = tube_fracs[ng - 1].x2;
-    double old_term1 = V * p_params.ct * bulb_data_old.mol_fracs_bulb2.x1 / dt;
+    double x1 = comp_data.bulb_data.mol_fracs_bulb2.x1;
+    double x2 = comp_data.bulb_data.mol_fracs_bulb2.x2;
+    double beta1_loc = beta1(comp_data.p_params, x1, x2);
+    double beta2_loc = beta2(comp_data.p_params, x1, x2);
+    double ap1 = V * comp_data.p_params.ct / dt - 2 * beta1_loc * A / dz;
+    double x1n = comp_data.tube_fracs[ng - 1].x1;
+    double x2n = comp_data.tube_fracs[ng - 1].x2;
+    double old_term1 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb2.x1 / dt;
     
     double x1_b2 = -2 * beta1_loc * x1n * A / dz + 2 * beta2_loc * (x2 - x2n) * A / dz + old_term1;
     x1_b2 = x1_b2 / ap1;
-    
+
     comp_data.bulb_data.mol_fracs_bulb2.x1 = x1_b2;
 }
 
 void bulb2_c2(c_data_t & comp_data) {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_old = comp_data.bulb_data_old;
-    b_data_t bulb_data = comp_data.bulb_data;
-    node_t * tube_fracs = comp_data.tube_fracs;
+    double V = comp_data.e_params.V;
+    double A = comp_data.e_params.A;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    double V = e_params.V;
-    double A = e_params.A;
-    double dz = e_params.dz;
-    double dt = t_params.dt;
-    
-    double x1 = bulb_data.mol_fracs_bulb2.x1;
-    double x2 = bulb_data.mol_fracs_bulb2.x2;
-    double alpha1_loc = alpha1(p_params, x1, x2);
-    double alpha2_loc = alpha2(p_params, x1, x2);
-    double ap2 = V * p_params.ct / dt - 2 * alpha2_loc * A / dz;
-    double x1n = tube_fracs[ng - 1].x1;
-    double x2n = tube_fracs[ng - 1].x2;
-    double old_term2 = V * p_params.ct * bulb_data_old.mol_fracs_bulb2.x2 / dt;
+    double x1 = comp_data.bulb_data.mol_fracs_bulb2.x1;
+    double x2 = comp_data.bulb_data.mol_fracs_bulb2.x2;
+    double alpha1_loc = alpha1(comp_data.p_params, x1, x2);
+    double alpha2_loc = alpha2(comp_data.p_params, x1, x2);
+    double ap2 = V * comp_data.p_params.ct / dt - 2 * alpha2_loc * A / dz;
+    double x1n = comp_data.tube_fracs[ng - 1].x1;
+    double x2n = comp_data.tube_fracs[ng - 1].x2;
+    double old_term2 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb2.x2 / dt;
 
     double x2_b2 = 2 * alpha1_loc / dz * (x1 - x1n) * A  - 2 * alpha2_loc * x2n * A / dz + old_term2;
     x2_b2 = x2_b2 / ap2;
-    
+
     comp_data.bulb_data.mol_fracs_bulb2.x2 = x2_b2;
-    comp_data.bulb_data.mol_fracs_bulb2.x3 = 1.0 - bulb_data.mol_fracs_bulb2.x1 - x2_b2;
+    comp_data.bulb_data.mol_fracs_bulb2.x3 = 1.0 - comp_data.bulb_data.mol_fracs_bulb2.x1 - x2_b2;
 }
 
 void tube0_c1(c_data_t & comp_data) {
+
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_inter = comp_data.bulb_data_inter;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
+    double x1w = comp_data.bulb_data_inter.mol_fracs_bulb1.x1;
+    double x2w = comp_data.bulb_data_inter.mol_fracs_bulb1.x2;
+    double x1e = 0.5 * (comp_data.tube_fracs_inter[0].x1 + comp_data.tube_fracs_inter[1].x1);
+    double x2e = 0.5 * (comp_data.tube_fracs_inter[0].x2 + comp_data.tube_fracs_inter[1].x2);
     
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double x2P = comp_data.tube_fracs[0].x2;
+    double x1E = comp_data.tube_fracs[1].x1;
+    double x2E = comp_data.tube_fracs[1].x2;
     
-    double x1w = bulb_data_inter.mol_fracs_bulb1.x1;
-    double x2w = bulb_data_inter.mol_fracs_bulb1.x2;
-    double x1e = 0.5 * (tube_fracs_inter[0].x1 + tube_fracs_inter[1].x1);
-    double x2e = 0.5 * (tube_fracs_inter[0].x2 + tube_fracs_inter[1].x2);
+    double beta1w = beta1(comp_data.p_params, x1w, x2w);
+    double beta2w = beta2(comp_data.p_params, x1w, x2w);
+    double beta1e = beta1(comp_data.p_params, x1e, x2e);
+    double beta2e = beta2(comp_data.p_params, x1e, x2e);
     
-    double x2P = tube_fracs[0].x2;
-    double x1E = tube_fracs[1].x1;
-    double x2E = tube_fracs[1].x2;
+    double ap1_tube0 = comp_data.p_params.ct * dz / dt - beta1w / (0.5 * dz) - beta1e / dz;
     
-    double beta1w = beta1(p_params, x1w, x2w);
-    double beta2w = beta2(p_params, x1w, x2w);
-    double beta1e = beta1(p_params, x1e, x2e);
-    double beta2e = beta2(p_params, x1e, x2e);
-    
-    double ap1_tube0 = p_params.ct * dz / dt - beta1w / (0.5 * dz) - beta1e / dz;
-    
-    double old_term_tube1 = p_params.ct * dz * tube_fracs_old[0].x1 / dt;
+    double old_term_tube1 = comp_data.p_params.ct * dz * comp_data.tube_fracs_old[0].x1 / dt;
     
     double x1_tube0 = - beta1w / (0.5 * dz) * x1w + beta2w / (0.5 * dz) * (x2P - x2w) - beta1e / dz * x1E - beta2e / dz * (x2E - x2P) + old_term_tube1;
     
@@ -240,77 +205,62 @@ void tube0_c1(c_data_t & comp_data) {
 
 void tube0_c2(c_data_t & comp_data) {
     
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    b_data_t bulb_data_inter = comp_data.bulb_data_inter;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double x1w = comp_data.bulb_data_inter.mol_fracs_bulb1.x1;
+    double x2w = comp_data.bulb_data_inter.mol_fracs_bulb1.x2;
+    double x1e = 0.5 * (comp_data.tube_fracs_inter[0].x1 + comp_data.tube_fracs_inter[1].x1);
+    double x2e = 0.5 * (comp_data.tube_fracs_inter[0].x2 + comp_data.tube_fracs_inter[1].x2);
     
-    double x1w = bulb_data_inter.mol_fracs_bulb1.x1;
-    double x2w = bulb_data_inter.mol_fracs_bulb1.x2;
-    double x1e = 0.5 * (tube_fracs_inter[0].x1 + tube_fracs_inter[1].x1);
-    double x2e = 0.5 * (tube_fracs_inter[0].x2 + tube_fracs_inter[1].x2);
+    double x1E = comp_data.tube_fracs[1].x1;
+    double x2E = comp_data.tube_fracs[1].x2;
+    double x1P = comp_data.tube_fracs_inter[0].x1;
     
-    double x1E = tube_fracs[1].x1;
-    double x2E = tube_fracs[1].x2;
-    double x1P = tube_fracs_inter[0].x1;
+    double alpha1w = alpha1(comp_data.p_params, x1w, x2w);
+    double alpha2w = alpha2(comp_data.p_params, x1w, x2w);
+    double alpha1e = alpha1(comp_data.p_params, x1e, x2e);
+    double alpha2e = alpha2(comp_data.p_params, x1e, x2e);
     
-    double alpha1w = alpha1(p_params, x1w, x2w);
-    double alpha2w = alpha2(p_params, x1w, x2w);
-    double alpha1e = alpha1(p_params, x1e, x2e);
-    double alpha2e = alpha2(p_params, x1e, x2e);
+    double ap2_tube0 = comp_data.p_params.ct * dz / dt - alpha2w / (0.5 * dz) - alpha2e / dz;
     
-    double ap2_tube0 = p_params.ct * dz / dt - alpha2w / (0.5 * dz) - alpha2e / dz;
-    
-    double old_term_tube2 = p_params.ct * dz * tube_fracs_old[0].x2 / dt;
+    double old_term_tube2 = comp_data.p_params.ct * dz * comp_data.tube_fracs_old[0].x2 / dt;
     
     double x2_tube0 = alpha1w / (0.5 * dz) * (x1P - x1w) - alpha2w / (0.5 * dz) * x2w - alpha1e / dz * (x1E - x1P) - alpha2e / dz * x2E + old_term_tube2;
     
     x2_tube0 = x2_tube0 / ap2_tube0;
     
     comp_data.tube_fracs[0].x2 = x2_tube0;
-    comp_data.tube_fracs[0].x3 = 1.0 - tube_fracs[0].x1 - x2_tube0;
+    comp_data.tube_fracs[0].x3 = 1.0 - comp_data.tube_fracs[0].x1 - x2_tube0;
 }
 
 void mid_nodes1(c_data_t & comp_data) {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
-    
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
     // Tube mid nodes, component 1
     for(int node = 1; node < ng - 1; ++node) {
-        double x1w = 0.5 * (tube_fracs_inter[node - 1].x1 + tube_fracs_inter[node].x1);
-        double x2w = 0.5 * (tube_fracs_inter[node - 1].x2 + tube_fracs_inter[node].x2);
-        double x1e = 0.5 * (tube_fracs_inter[node].x1 + tube_fracs_inter[node + 1].x1);
-        double x2e = 0.5 * (tube_fracs_inter[node].x2 + tube_fracs_inter[node + 1].x2);
+        double x1w = 0.5 * (comp_data.tube_fracs_inter[node - 1].x1 + comp_data.tube_fracs_inter[node].x1);
+        double x2w = 0.5 * (comp_data.tube_fracs_inter[node - 1].x2 + comp_data.tube_fracs_inter[node].x2);
+        double x1e = 0.5 * (comp_data.tube_fracs_inter[node].x1 + comp_data.tube_fracs_inter[node + 1].x1);
+        double x2e = 0.5 * (comp_data.tube_fracs_inter[node].x2 + comp_data.tube_fracs_inter[node + 1].x2);
 
-        double x1W = tube_fracs[node - 1].x1;
-        double x2W = tube_fracs[node - 1].x2;
-        double x1E = tube_fracs[node + 1].x1;
-        double x2E = tube_fracs[node + 1].x2;
-        double x2P = tube_fracs[node].x2;
+        double x1W = comp_data.tube_fracs[node - 1].x1;
+        double x2W = comp_data.tube_fracs[node - 1].x2;
+        double x1E = comp_data.tube_fracs[node + 1].x1;
+        double x2E = comp_data.tube_fracs[node + 1].x2;
+        double x2P = comp_data.tube_fracs[node].x2;
 
-        double beta1w = beta1(p_params, x1w, x2w);
-        double beta2w = beta2(p_params, x1w, x2w);
-        double beta1e = beta1(p_params, x1e, x2e);
-        double beta2e = beta2(p_params, x1e, x2e);
+        double beta1w = beta1(comp_data.p_params, x1w, x2w);
+        double beta2w = beta2(comp_data.p_params, x1w, x2w);
+        double beta1e = beta1(comp_data.p_params, x1e, x2e);
+        double beta2e = beta2(comp_data.p_params, x1e, x2e);
 
-        double ap1_tube_node = p_params.ct * dz / dt - beta1w / dz - beta1e / dz;
+        double ap1_tube_node = comp_data.p_params.ct * dz / dt - beta1w / dz - beta1e / dz;
         
-        double old_term_tube1 = p_params.ct * dz / dt * tube_fracs_old[node].x1;
+        double old_term_tube1 = comp_data.p_params.ct * dz / dt * comp_data.tube_fracs_old[node].x1;
 
         double x1_tube_node = - beta1w / dz * x1W + beta2w / dz * (x2P - x2W) - beta1e / dz * x1E - beta2e / dz * (x2E - x2P) + old_term_tube1;
 
@@ -323,36 +273,29 @@ void mid_nodes1(c_data_t & comp_data) {
 void mid_nodes2(c_data_t & comp_data)  {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
-    
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
     for(int node = 1; node < ng - 1; ++node) {
-        double x1w = 0.5 * (tube_fracs_inter[node - 1].x1 + tube_fracs_inter[node].x1);
-        double x2w = 0.5 * (tube_fracs_inter[node - 1].x2 + tube_fracs_inter[node].x2);
-        double x1e = 0.5 * (tube_fracs_inter[node].x1 + tube_fracs_inter[node + 1].x1);
-        double x2e = 0.5 * (tube_fracs_inter[node].x2 + tube_fracs_inter[node + 1].x2);
+        double x1w = 0.5 * (comp_data.tube_fracs_inter[node - 1].x1 + comp_data.tube_fracs_inter[node].x1);
+        double x2w = 0.5 * (comp_data.tube_fracs_inter[node - 1].x2 + comp_data.tube_fracs_inter[node].x2);
+        double x1e = 0.5 * (comp_data.tube_fracs_inter[node].x1 + comp_data.tube_fracs_inter[node + 1].x1);
+        double x2e = 0.5 * (comp_data.tube_fracs_inter[node].x2 + comp_data.tube_fracs_inter[node + 1].x2);
 
-        double x1W = tube_fracs[node - 1].x1;
-        double x2W = tube_fracs[node - 1].x2;
-        double x1E = tube_fracs[node + 1].x1;
-        double x2E = tube_fracs[node + 1].x2;
-        double x1P = tube_fracs[node].x1;
+        double x1W = comp_data.tube_fracs[node - 1].x1;
+        double x2W = comp_data.tube_fracs[node - 1].x2;
+        double x1E = comp_data.tube_fracs[node + 1].x1;
+        double x2E = comp_data.tube_fracs[node + 1].x2;
+        double x1P = comp_data.tube_fracs[node].x1;
 
-        double alpha1w = alpha1(p_params, x1w, x2w);
-        double alpha2w = alpha2(p_params, x1w, x2w);
-        double alpha1e = alpha1(p_params, x1e, x2e);
-        double alpha2e = alpha2(p_params, x1e, x2e);
+        double alpha1w = alpha1(comp_data.p_params, x1w, x2w);
+        double alpha2w = alpha2(comp_data.p_params, x1w, x2w);
+        double alpha1e = alpha1(comp_data.p_params, x1e, x2e);
+        double alpha2e = alpha2(comp_data.p_params, x1e, x2e);
 
-        double ap2_tube_node = p_params.ct * dz / dt - alpha2w / dz - alpha2e / dz;
+        double ap2_tube_node = comp_data.p_params.ct * dz / dt - alpha2w / dz - alpha2e / dz;
         
-        double old_term_tube2 = p_params.ct * dz / dt * tube_fracs_old[node].x2;
+        double old_term_tube2 = comp_data.p_params.ct * dz / dt * comp_data.tube_fracs_old[node].x2;
 
         double x2_tube_node = alpha1w / dz * (x1P - x1W) - alpha2w / dz * x2W - alpha1e * (x1E - x1P) / dz - alpha2e / dz * x2E + old_term_tube2;
 
@@ -365,36 +308,28 @@ void mid_nodes2(c_data_t & comp_data)  {
 void tube_n_c1(c_data_t & comp_data) {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
-    b_data_t bulb_data_inter = comp_data.bulb_data_inter;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double x1w = 0.5 * (comp_data.tube_fracs_inter[ng - 2].x1 + comp_data.tube_fracs_inter[ng - 1].x1);
+    double x2w = 0.5 * (comp_data.tube_fracs_inter[ng - 2].x2 + comp_data.tube_fracs_inter[ng - 1].x2);
+    double x1e = comp_data.bulb_data_inter.mol_fracs_bulb2.x1;
+    double x2e = comp_data.bulb_data_inter.mol_fracs_bulb2.x2;
     
-    double x1w = 0.5 * (tube_fracs_inter[ng - 2].x1 + tube_fracs_inter[ng - 1].x1);
-    double x2w = 0.5 * (tube_fracs_inter[ng - 2].x2 + tube_fracs_inter[ng - 1].x2);
-    double x1e = bulb_data_inter.mol_fracs_bulb2.x1;
-    double x2e = bulb_data_inter.mol_fracs_bulb2.x2;
-    
-    double x1W = tube_fracs[ng - 2].x1;
-    double x2W = tube_fracs[ng - 2].x2;
+    double x1W = comp_data.tube_fracs[ng - 2].x1;
+    double x2W = comp_data.tube_fracs[ng - 2].x2;
     double x1E = x1e;
     double x2E = x2e;
-    double x2P = tube_fracs[ng - 1].x2;
+    double x2P = comp_data.tube_fracs[ng - 1].x2;
     
-    double beta1w = beta1(p_params, x1w, x2w);
-    double beta2w = beta2(p_params, x1w, x2w);
-    double beta1e = beta1(p_params, x1e, x2e);
-    double beta2e = beta2(p_params, x1e, x2e);
+    double beta1w = beta1(comp_data.p_params, x1w, x2w);
+    double beta2w = beta2(comp_data.p_params, x1w, x2w);
+    double beta1e = beta1(comp_data.p_params, x1e, x2e);
+    double beta2e = beta2(comp_data.p_params, x1e, x2e);
     
-    double ap1_tube_n = p_params.ct * dz / dt - beta1w / dz - beta1e / (0.5 * dz);
+    double ap1_tube_n = comp_data.p_params.ct * dz / dt - beta1w / dz - beta1e / (0.5 * dz);
     
-    double old_term_tube_n_1 = p_params.ct * dz / dt * tube_fracs_old[ng - 1].x1;
+    double old_term_tube_n_1 = comp_data.p_params.ct * dz / dt * comp_data.tube_fracs_old[ng - 1].x1;
     
     double x1_tube_n = - beta1w / dz * x1W + beta2w / dz * (x2P - x2W) - beta1e / (0.5 * dz) * x1E - beta2e / dz * (x2E - x2P) + old_term_tube_n_1;
     
@@ -406,36 +341,28 @@ void tube_n_c1(c_data_t & comp_data) {
 void tube_n_c2(c_data_t & comp_data)  {
     
     int ng = comp_data.ng;
-    p_params_t p_params = comp_data.p_params;
-    e_params_t e_params = comp_data.e_params;
-    t_params_t t_params = comp_data.t_params;
-    node_t * tube_fracs_inter = comp_data.tube_fracs_inter;
-    node_t * tube_fracs = comp_data.tube_fracs;
-    node_t * tube_fracs_old = comp_data.tube_fracs_old;
-    b_data_t bulb_data_inter = comp_data.bulb_data_inter;
+    double dz = comp_data.e_params.dz;
+    double dt = comp_data.t_params.dt;
     
-    double dz = e_params.dz;
-    double dt = t_params.dt;
+    double x1w = 0.5 * (comp_data.tube_fracs_inter[ng - 2].x1 + comp_data.tube_fracs_inter[ng - 1].x1);
+    double x2w = 0.5 * (comp_data.tube_fracs_inter[ng - 2].x2 + comp_data.tube_fracs_inter[ng - 1].x2);
+    double x1e = comp_data.bulb_data_inter.mol_fracs_bulb2.x1;
+    double x2e = comp_data.bulb_data_inter.mol_fracs_bulb2.x2;
     
-    double x1w = 0.5 * (tube_fracs_inter[ng - 2].x1 + tube_fracs_inter[ng - 1].x1);
-    double x2w = 0.5 * (tube_fracs_inter[ng - 2].x2 + tube_fracs_inter[ng - 1].x2);
-    double x1e = bulb_data_inter.mol_fracs_bulb2.x1;
-    double x2e = bulb_data_inter.mol_fracs_bulb2.x2;
-    
-    double x1W = tube_fracs[ng - 2].x1;
-    double x2W = tube_fracs[ng - 2].x2;
+    double x1W = comp_data.tube_fracs[ng - 2].x1;
+    double x2W = comp_data.tube_fracs[ng - 2].x2;
     double x1E = x1e;
     double x2E = x2e;
-    double x1P = tube_fracs[ng - 1].x1;
+    double x1P = comp_data.tube_fracs[ng - 1].x1;
     
-    double alpha1w = alpha1(p_params, x1w, x2w);
-    double alpha2w = alpha2(p_params, x1w, x2w);
-    double alpha1e = alpha1(p_params, x1e, x2e);
-    double alpha2e = alpha2(p_params, x1e, x2e);
+    double alpha1w = alpha1(comp_data.p_params, x1w, x2w);
+    double alpha2w = alpha2(comp_data.p_params, x1w, x2w);
+    double alpha1e = alpha1(comp_data.p_params, x1e, x2e);
+    double alpha2e = alpha2(comp_data.p_params, x1e, x2e);
     
-    double ap2_tube_n = p_params.ct * dz / dt - alpha2w / dz - alpha2e / (0.5 * dz);
+    double ap2_tube_n = comp_data.p_params.ct * dz / dt - alpha2w / dz - alpha2e / (0.5 * dz);
     
-    double old_term_tube_n_2 = p_params.ct * dz / dt * tube_fracs_old[ng - 1].x2;
+    double old_term_tube_n_2 = comp_data.p_params.ct * dz / dt * comp_data.tube_fracs_old[ng - 1].x2;
     
     double x2_tube_n = alpha1w / dz * (x1P - x1W) - alpha2w / dz * x2W - alpha1e / (0.5 * dz) * (x1E - x1P) - alpha2e / (0.5 * dz) * x2E + old_term_tube_n_2;
     
@@ -496,6 +423,13 @@ void compute_bulb_compositions(e_params_t e_params,
     
     // Organize data
     c_data_t comp_data;
+    comp_data.ng = ng;
+    comp_data.p_params = p_params;
+    comp_data.e_params = e_params;
+    comp_data.t_params = t_params;
+    comp_data.bulb_data = bulb_data;
+    comp_data.bulb_data_old = bulb_data;
+    comp_data.bulb_data_inter = bulb_data;
     
     // Allocate data for tube composition
     comp_data.tube_fracs = new node_t[ng];
@@ -522,20 +456,13 @@ void compute_bulb_compositions(e_params_t e_params,
     double t = t_params.to;
     double dt = (t_params.tf - t_params.to) / t_params.nt;
     
-    // Organize data continued
-    comp_data.ng = ng;
-    comp_data.p_params = p_params;
-    comp_data.e_params = e_params;
-    comp_data.t_params = t_params;
-    comp_data.bulb_data = bulb_data;
-    comp_data.bulb_data_old = bulb_data;
-    comp_data.bulb_data_inter = bulb_data;
-    
     // Compute composition
     while(t < t_params.tf) {
         
+        // Update bulb composition of previous time step
         comp_data.bulb_data_old = comp_data.bulb_data;
         
+        // Update tube composition of previous time step
         for(int node = 0; node < ng; ++node)
             comp_data.tube_fracs_old[node] = comp_data.tube_fracs[node];
         
