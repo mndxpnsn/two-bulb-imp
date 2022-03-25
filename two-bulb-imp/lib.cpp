@@ -379,7 +379,7 @@ void set_frac_comp3(c_data_t & comp_data) {
     }
 }
 
-void update_tube_fracs(c_data_t & comp_data) {
+void update_composition_estimates(c_data_t & comp_data) {
     
     // Bulb 1, component 1
     bulb1_c1(comp_data);
@@ -482,7 +482,7 @@ void compute_bulb_compositions(e_params_t e_params,
             while(in_it < max_in_it) {
 
                 // Update estimate tube composition
-                update_tube_fracs(comp_data);
+                update_composition_estimates(comp_data);
                 
                 in_it++;
             }
