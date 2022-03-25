@@ -132,14 +132,19 @@ void bulb1_c1(c_data_t & comp_data) {
     // Bulb 1, component 1
     double x1 = comp_data.bulb_data.mol_fracs_bulb1.x1;
     double x2 = comp_data.bulb_data.mol_fracs_bulb1.x2;
+    
     double beta1_loc = beta1(comp_data.p_params, x1, x2);
     double beta2_loc = beta2(comp_data.p_params, x1, x2);
+    
     double ap1 = V * comp_data.p_params.ct / dt - 2 * beta1_loc * A / dz;
+    
     double x11 = comp_data.tube_fracs[0].x1;
     double x21 = comp_data.tube_fracs[0].x2;
+    
     double old_term1 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb1.x1 / dt;
     
     double x1_b1 = -2 * beta1_loc * x11 * A / dz - 2 * beta2_loc * (x21 - x2) * A / dz + old_term1;
+    
     x1_b1 = x1_b1 / ap1;
     
     // Store coefficients for analysis
@@ -161,14 +166,19 @@ void bulb1_c2(c_data_t & comp_data) {
     // Bulb 1, component 2
     double x1 = comp_data.bulb_data.mol_fracs_bulb1.x1;
     double x2 = comp_data.bulb_data.mol_fracs_bulb1.x2;
+    
     double alpha1_loc = alpha1(comp_data.p_params, x1, x2);
     double alpha2_loc = alpha2(comp_data.p_params, x1, x2);
+    
     double ap2 = V * comp_data.p_params.ct / dt - 2 * alpha2_loc * A / dz;
+    
     double x11 = comp_data.tube_fracs[0].x1;
     double x21 = comp_data.tube_fracs[0].x2;
+    
     double old_term2 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb1.x2 / dt;
 
     double x2_b1 = -2 * alpha1_loc / dz * (x11 - x1) * A  - 2 * alpha2_loc * x21 * A / dz + old_term2;
+    
     x2_b1 = x2_b1 / ap2;
 
     // Store coefficients for analysis
@@ -191,14 +201,19 @@ void bulb2_c1(c_data_t & comp_data) {
     
     double x1 = comp_data.bulb_data.mol_fracs_bulb2.x1;
     double x2 = comp_data.bulb_data.mol_fracs_bulb2.x2;
+    
     double beta1_loc = beta1(comp_data.p_params, x1, x2);
     double beta2_loc = beta2(comp_data.p_params, x1, x2);
+    
     double ap1 = V * comp_data.p_params.ct / dt - 2 * beta1_loc * A / dz;
+    
     double x1n = comp_data.tube_fracs[ng - 1].x1;
     double x2n = comp_data.tube_fracs[ng - 1].x2;
+    
     double old_term1 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb2.x1 / dt;
     
     double x1_b2 = -2 * beta1_loc * x1n * A / dz + 2 * beta2_loc * (x2 - x2n) * A / dz + old_term1;
+    
     x1_b2 = x1_b2 / ap1;
     
     // Store coefficients for analysis
@@ -220,14 +235,19 @@ void bulb2_c2(c_data_t & comp_data) {
     
     double x1 = comp_data.bulb_data.mol_fracs_bulb2.x1;
     double x2 = comp_data.bulb_data.mol_fracs_bulb2.x2;
+    
     double alpha1_loc = alpha1(comp_data.p_params, x1, x2);
     double alpha2_loc = alpha2(comp_data.p_params, x1, x2);
+    
     double ap2 = V * comp_data.p_params.ct / dt - 2 * alpha2_loc * A / dz;
+    
     double x1n = comp_data.tube_fracs[ng - 1].x1;
     double x2n = comp_data.tube_fracs[ng - 1].x2;
+    
     double old_term2 = V * comp_data.p_params.ct * comp_data.bulb_data_old.mol_fracs_bulb2.x2 / dt;
 
     double x2_b2 = 2 * alpha1_loc / dz * (x1 - x1n) * A  - 2 * alpha2_loc * x2n * A / dz + old_term2;
+    
     x2_b2 = x2_b2 / ap2;
 
     // Store coefficients for analysis
@@ -528,10 +548,12 @@ void init_stab_data(int ng) {
     for(int i = 0; i < ng + 2; ++i) {
         anb_coeff1[i] = new double[3];
         anb_coeff2[i] = new double[3];
+        
         for(int j = 0; j < 3; ++j) {
             anb_coeff1[i][j] = SMALL_NUM;
             anb_coeff2[i][j] = SMALL_NUM;
         }
+        
         ap_coeff1[i] = SMALL_NUM;
         ap_coeff2[i] = SMALL_NUM;
     }
