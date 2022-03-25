@@ -481,7 +481,7 @@ void compute_bulb_compositions(e_params_t e_params,
             int in_it = 0;
             while(in_it < max_in_it) {
 
-                // Update estimate tube composition
+                // Update estimates bulb and tube composition
                 update_composition_estimates(comp_data);
                 
                 in_it++;
