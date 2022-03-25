@@ -634,9 +634,6 @@ void compute_bulb_compositions(e_params_t e_params,
         int out_it = 0;
         while(out_it < max_out_it) {
 
-            // Check stability
-            check_stability(ng);
-
             // Update intermediate bulb composition
             comp_data.bulb_data_inter = comp_data.bulb_data;
             
@@ -653,6 +650,9 @@ void compute_bulb_compositions(e_params_t e_params,
                 
                 in_it++;
             }
+            
+            // Check stability
+            check_stability(ng);
             
             out_it++;
         }
