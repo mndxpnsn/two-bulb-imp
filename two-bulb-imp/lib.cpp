@@ -44,8 +44,8 @@ void check_stability(int ng) {
         if(!is_stable_loc1) { is_stable = false; }
         if(!is_stable_loc2) { is_stable = false; }
 
-        if(ratio1 < 1) { l_one1 = true; }
-        if(ratio2 < 1) { l_one2 = true; }
+        if(ratio1 < 1.0) { l_one1 = true; }
+        if(ratio2 < 1.0) { l_one2 = true; }
     }
 
     is_stable = is_stable && l_one1 && l_one2;
