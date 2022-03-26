@@ -36,10 +36,10 @@ void check_stability(int ng) {
         }
 
         double ratio1 = abs_sum1 / fabs(ap_coeff1[node]);
-        bool is_stable_loc1 = ratio1 <= 1;
+        bool is_stable_loc1 = ratio1 <= 1.0;
 
         double ratio2 = abs_sum2 / fabs(ap_coeff2[node]);
-        bool is_stable_loc2 = ratio2 <= 1;
+        bool is_stable_loc2 = ratio2 <= 1.0;
 
         if(!is_stable_loc1) { is_stable = false; }
         if(!is_stable_loc2) { is_stable = false; }
