@@ -30,12 +30,12 @@ int main(int argc, const char * argv[]) {
     b_data_t bulb_data;
     bulb_data.mol_fracs_bulb1.x1 = 0.501; // Bulb 1 H2 fraction
     bulb_data.mol_fracs_bulb1.x2 = 0.499; // Bulb 1 N2 fraction
-    bulb_data.mol_fracs_bulb1.x3 = 1.0 - 0.501 - 0.499; // Bulb 1 CO2 fraction
+    bulb_data.mol_fracs_bulb1.x3 = 0.0; // Bulb 1 CO2 fraction
     
     // Initial composition bulb 2
     bulb_data.mol_fracs_bulb2.x1 = 0.0; // Bulb 2 H2 fraction
     bulb_data.mol_fracs_bulb2.x2 = 0.501; // Bulb 2 N2 fraction
-    bulb_data.mol_fracs_bulb2.x3 = 1.0 - 0.0 - 0.501; // Bulb 2 CO2 fraction
+    bulb_data.mol_fracs_bulb2.x3 = 0.499; // Bulb 2 CO2 fraction
     
     // Total concentration
     p_params_t p_params;

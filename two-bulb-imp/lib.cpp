@@ -439,7 +439,7 @@ void tube_n_c1(c_data_t & comp_data) {
     
     double old_term_tube_n_1 = comp_data.p_params.ct * dz / dt * comp_data.tube_fracs_old[ng - 1].x1;
     
-    double x1_tube_n = - beta1w / dz * x1W + beta2w / dz * (x2P - x2W) - beta1e / (0.5 * dz) * x1E - beta2e / dz * (x2E - x2P) + old_term_tube_n_1;
+    double x1_tube_n = - beta1w / dz * x1W + beta2w / dz * (x2P - x2W) - beta1e / (0.5 * dz) * x1E - beta2e / (0.5 * dz) * (x2E - x2P) + old_term_tube_n_1;
     
     x1_tube_n = x1_tube_n / ap1_tube_n;
 
